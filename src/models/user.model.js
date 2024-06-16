@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true,
+    // required: true,
   },
   phone: {
     type: String,
@@ -14,16 +14,20 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
     unique: true, // Ensuring the email is unique
   },
+  role:{
+    type:String,
+    default:"USER",
+    enum:["USER", "VENDOR"]
+  },
   dob: {
-    type: Date,
-    required: true,
+    type: String,
+    // required: true,
   },
   otp: {
-    type: String,
-    required: false, // OTP is optional, used for phone verification
+    type: Number,
+    // required: false, // OTP is optional, used for phone verification
   },
   isPhoneVerified: {
     type: Boolean,

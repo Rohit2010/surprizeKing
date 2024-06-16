@@ -1,25 +1,43 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Define the services Schema
-const categoryServicesSchema = new Schema({
-  category:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Category"
+// Define the Service Schema
+const serviceSchema = new Schema({
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: 'Category', // Reference to the Category model
+    required: true
   },
-  name: {
+  serviceName: {
     type: String,
-    required: true,
+    required: true
   },
   status: {
+    type: String,
+    enum: ['active', 'inactive'], // Example values, adjust as needed
+    default: 'active'
+  },
+  displayOrder: {
+    type: Number,
+    required: true
+  },
+  showInSidebar: {
     type: Boolean,
-    default: false, 
-  }
+    default: false
+  },
+  serviceImage: {
+    type: String, // You can store the path or URL of the image
+    required: false
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
 }, {
-  timestamps: true, // Automatically add createdAt and updatedAt fields
+  timestamps: true // Automatically add createdAt and updatedAt fields
 });
 
-// Create the User Model
-const Service = mongoose.model('Service', categoryServicesSchema);
+// Create the Service Model
+const Service = mongoose.model('Service', serviceSchema);
 
 module.exports = Service;

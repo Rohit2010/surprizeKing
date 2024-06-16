@@ -3,6 +3,7 @@ const express = require('express');
 const compression = require('compression');
 
 const helmet = require('helmet');
+const path = require("path")
 
 const httpStatus = require('http-status');
 const routes = require('./routes/v1');
@@ -23,6 +24,9 @@ if (config.env !== 'test') {
 // set security HTTP headers
 app.use(helmet());
 
+// Serve static files
+const staticPath = path.join(__dirname, "..", "uploads"); // Define the path to your static files
+app.use("/uploads", express.static(staticPath));
 // parse json request body
 app.use(express.json());
 

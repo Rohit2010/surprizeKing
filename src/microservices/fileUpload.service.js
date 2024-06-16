@@ -1,86 +1,51 @@
-const uuid = require('uuid').v4;
 const multer = require('multer');
-const storage = multer.memoryStorage();
-const {getSignedUrl} = require('@aws-sdk/s3-request-presigner');
-const {S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand} = require('@aws-sdk/client-s3');
+const path = require('path');
+const fs = require('fs');
+const express = require('express'); // Assuming you're using express
 
-const config = require('../config/config');
-const {fileTypes} = require('../constants');
-const ApiError = require('../utils/ApiError');
-const httpStatus = require('http-status');
-const {accessKeyId, region, secretAccessKey, name} = config.aws.s3;
+// Define the maximum size for uploading
+const maxSize = 50 * 1024 * 1024;
 
-const s3client = new S3Client({
-  region,
-  credentials: {accessKeyId, secretAccessKey},
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const splitUrl = req.baseUrl.split("/");
+    console.log(splitUrl[splitUrl.length - 1]);
+    const dir = "uploads/" + splitUrl[splitUrl.length - 1];
+    console.log(dir);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    cb(null, dir);
+  },
+  filename: function (req, file, cb) {
+    let fileType = file.originalname.split(".")[1];
+    if (fileType.includes("+")) {
+      fileType = fileType.split("+")[0];
+    }
+    cb(null, file.fieldname + "-" + Date.now() + "." + fileType);
+  },
 });
 
-async function fileFilter(req, file, cb) {
-  if (fileTypes.includes(file.mimetype)) {
-    cb(null, true);
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: maxSize },
+  fileFilter: function (req, file, cb) {
+    checkFileType(file, cb);
+  },
+});
+
+// Check File Type
+function checkFileType(file, cb) {
+  // Allowed ext
+  const filetypes = /doc|docx|pdf|ppt|pptx|xls|xlsx|mp4|mov|jpeg|jpg|png|gif|svg|csv|swf|mp3|AVI|WMV|flv|ogg|webm|webp|wav/;
+  // Check ext
+  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+
+  if (extname) {
+    return cb(null, true);
   } else {
-    console.log(file);
-    cb(new ApiError(httpStatus.BAD_REQUEST, 'Invalid file or data'), false);
+    cb(new Error("Error: Images & Videos Only!"));
   }
 }
 
-const multerUpload = multer({
-  storage,
-  fileFilter,
-  // limits: { fileSize: 10000000, files: 10 },
-});
-
-/**
- * Generates a URL for accessing an S3 object.
- * @param {string} Key - The key (or path) of the S3 object.
- * @param {boolean} [signedUrl=false] - Indicates whether to return a signed URL.
- * @param {number} [expiresIn] - The duration (in seconds) for which the signed URL remains valid.
- * @returns {Promise<{ key: string, url: string }>} An object containing the S3 object key and URL.
- */
-
-async function getObjectURL(Key, signedUrl = false, expiresIn = 3600) {
-  const command = new GetObjectCommand({
-    Key,
-    Bucket: name,
-  });
-  const url = await getSignedUrl(s3client, command, {expiresIn});
-  return {
-    key: Key,
-    url: signedUrl ? url : url.split('?')[0],
-  };
-}
-
-async function s3Delete(Key) {
-  const command = new DeleteObjectCommand({Key, Bucket: name});
-  return s3client.send(command);
-}
-
-async function s3Upload(files, folder = 'uploads', private = false, expiresIn = 3600) {
-  const params = files.map(file => {
-    return {
-      Bucket: name,
-      Key: `${private ? 'private' : 'public'}/${folder}/${uuid()}-${file.originalname}`,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-  });
-
-  return Promise.all(
-    params.map(async param =>
-      s3client
-        .send(new PutObjectCommand(param))
-        .then(async () => getObjectURL(param.Key, private, expiresIn))
-        .catch(err => {
-          console.log(err);
-          throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, 'Failed to upload the media');
-        })
-    )
-  );
-}
-
-module.exports = {
-  s3Upload,
-  s3Delete,
-  getObjectURL,
-  multerUpload,
-};
+module.exports = upload;

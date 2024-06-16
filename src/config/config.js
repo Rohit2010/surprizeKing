@@ -12,6 +12,7 @@ const envVarsSchema = Joi.object()
       .required(),
     PORT: Joi.number().default(8082),
     MONGODB_URL: Joi.string().required(),
+    JWT_SECRET:Joi.string().required(),
   })
   .unknown();
 
@@ -34,4 +35,5 @@ module.exports = {
       useUnifiedTopology: true,
     },
   },
+  jwtSecret:envVars.JWT_SECRET
 };
