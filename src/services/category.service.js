@@ -12,11 +12,14 @@ const createCategory = async (data) => {
   }
 };
 
-const getCategories = async (search) => {
+const getCategories = async (search, status) => {
   try {
     const query = {isDeleted:false};
     if (search) {
       query.categoryName = { $regex: search, $options: 'i' }; // Case-insensitive search
+    }
+    if (status) {
+      query.status = { $regex: status, $options: 'i' }; // Case-insensitive search
     }
     return await CategoryModel.find(query);
   } catch (error) {

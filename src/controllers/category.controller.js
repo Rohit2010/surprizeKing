@@ -31,8 +31,8 @@ const updateCategory = catchAsync(async (req, res) => {
 
 //get all categories 
 const getAllCategories = catchAsync(async (req, res) => {
-    const { search } = req.query;
-    const categories = await categoryService.getCategories(search)
+    const { search, status } = req.query;
+    const categories = await categoryService.getCategories(search, status)
 
     res.json({data:categories})
 })
