@@ -8,7 +8,7 @@ const vendorSchema = new Schema({
   },
   information: {
     vendorName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     website: { type: String },
     businessName: { type: String, required: true },
     contactNumber: { type: String, required: true },
