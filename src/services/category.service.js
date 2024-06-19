@@ -1,6 +1,6 @@
 const {CategoryModel, ServiceModel} = require('../models');
 const ApiError = require('../utils/ApiError');
-const { getNewPathAndRemoveOld, getPathFromPath } = require('../utils/getPath');
+const {  getPathFromPath } = require('../utils/getPath');
 const { objectId } = require('../utils/queryPHandler');
 
 //category service functions
@@ -112,7 +112,7 @@ const createService = async (data) => {
   
   const getServiceById = async (id) => {
     try {
-      const service = await ServiceModel.findById(id).populate('category');
+      const service = await ServiceModel.findById(id);
       if (!service) {
         throw new ApiError(404, 'Service not found');
       }

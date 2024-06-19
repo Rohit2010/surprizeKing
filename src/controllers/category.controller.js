@@ -1,5 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
-const { getPathFromPath, getNewPathAndRemoveOld } = require("../utils/getPath");
+const { getPathFromPath } = require("../utils/getPath");
 const {categoryService} = require("../services/index");
 const { objectId } = require("../utils/queryPHandler");
 
