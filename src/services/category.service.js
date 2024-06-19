@@ -20,7 +20,7 @@ const getCategories = async (search, status) => {
       query.categoryName = { $regex: search, $options: 'i' }; // Case-insensitive search
     }
     if (status) {
-      query.status = { $regex: status, $options: 'i' }; // Case-insensitive search
+      query.status = status; // Case-insensitive search
     }
     return await CategoryModel.find(query);
   } catch (error) {
