@@ -1,6 +1,6 @@
 const {CategoryModel, ServiceModel} = require('../models');
 const ApiError = require('../utils/ApiError');
-const { getNewPathAndRemoveOld } = require('../utils/getPath');
+const { getNewPathAndRemoveOld, getPathFromPath } = require('../utils/getPath');
 const { objectId } = require('../utils/queryPHandler');
 
 //category service functions
@@ -53,8 +53,8 @@ const updateCategory = async (id, data) => {
         displayOrder: displayOrder ? displayOrder : updatedCategory.displayOrder,
         showInHeader: showInHeader !== undefined ? showInHeader : updatedCategory.showInHeader,
         trendingCategory:trendingCategory !== undefined ? trendingCategory : updatedCategory.trendingCategory,
-        categoryImage:categoryImage ? getNewPathAndRemoveOld(updatedCategory.categoryImage, categoryImage) : updatedCategory.categoryImage,
-        categoryIcon:categoryIcon ?  getNewPathAndRemoveOld(updatedCategory.categoryIcon, categoryIcon) : updatedCategory.categoryIcon,
+        categoryImage:categoryImage ? getPathFromPath(categoryImage) : updatedCategory.categoryImage,
+        categoryIcon:categoryIcon ?  getPathFromPath(categoryIcon) : updatedCategory.categoryIcon,
         categoryIconCode : categoryIconCode ? categoryIconCode : updatedCategory.categoryIconCode,
     }, {new:true})
     return updateCat;
@@ -92,7 +92,7 @@ const createService = async (data) => {
         query.serviceName = { $regex: search, $options: 'i' }; // Case-insensitive search
       }
       if (status) {
-        query.status = { $regex: status, $options: 'i' }; // Case-insensitive search
+        query.status = status; // Case-insensitive search
       }
       if (parent) {
         query.category = objectId(parent); 
@@ -130,7 +130,7 @@ const createService = async (data) => {
           status: status ? status : updatedService.status,
           displayOrder: displayOrder ? displayOrder : updatedService.displayOrder,
           showInSidebar: showInSidebar !== undefined ? showInSidebar : updatedService.showInSidebar,
-          serviceImage: serviceImage ? getNewPathAndRemoveOld(updatedService.serviceImage, serviceImage) : updatedService.serviceImage
+          serviceImage: serviceImage ? getPathFromPath(serviceImage) : updatedService.serviceImage
       }, { new: true });
       return updateSvc;
     } catch (error) {
