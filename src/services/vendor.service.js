@@ -1,22 +1,33 @@
-const { User, VendorModel } = require('../models');
+const { userService } = require('.');
+const {  VendorModel } = require('../models');
 const ApiError = require('../utils/ApiError');
-
+const { objectId } = require('../utils/queryPHandler');
 
 const createVendor = async (data) => {
+  const {contactNumber, email} = data.information;
   try {
-    const user = await User.create({phone:data.information.contactNumber, role:"VENDOR"})
-    const newVendor = new VendorModel({...data, userId:user._id});
+    const user = await userService.createUser({phone:contactNumber, email:email,role:"VENDOR"})
+    const newVendor = new VendorModel({...data, userId:user._id, isVerified:true});
     return await newVendor.save();
   } catch (error) {
     throw new ApiError(400, error.message);
   }
 };
 
-const getVendors = async (search) => {
+const getVendors = async ({vendorName,email, businessName, contactNumber }) => {
   try {
     const query = {};
-    if (search) {
-      query['information.vendorName'] = { $regex: search, $options: 'i' }; // Case-insensitive search
+    if (vendorName) {
+      query['information.vendorName'] = { $regex: vendorName, $options: 'i' }; // Case-insensitive search
+    }
+    if (email) {
+      query['information.email'] = { $regex: email, $options: 'i' }; // Case-insensitive search
+    }
+    if (businessName) {
+      query['information.businessName'] = { $regex: businessName, $options: 'i' }; // Case-insensitive search
+    }
+    if (contactNumber) {
+      query['information.contactNumber'] = { $regex: contactNumber, $options: 'i' }; // Case-insensitive search
     }
     return await VendorModel.find(query).populate("userId");
   } catch (error) {
@@ -38,12 +49,12 @@ const getVendorById = async (id) => {
 
 const updateVendor = async (id, data) => {
   try {
-    const updatedVendor = await VendorModel.findById(id);
+    const updatedVendor = await VendorModel.findById(objectId(id));
     if (!updatedVendor) {
       throw new ApiError(404, 'Vendor not found');
     }
 
-    const updateVdr = await VendorModel.findByIdAndUpdate(id, {
+    const updateVdr = await VendorModel.findByIdAndUpdate(objectId(id), {
       'information.vendorName': data.information.vendorName ? data.information.vendorName : updatedVendor.information.vendorName,
       'information.email': data.information.email ? data.information.email : updatedVendor.information.email,
       'information.website': data.information.website ? data.information.website : updatedVendor.information.website,

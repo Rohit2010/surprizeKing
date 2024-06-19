@@ -1,6 +1,7 @@
 const {CategoryModel, ServiceModel} = require('../models');
 const ApiError = require('../utils/ApiError');
 const { getNewPathAndRemoveOld } = require('../utils/getPath');
+const { objectId } = require('../utils/queryPHandler');
 
 //category service functions
 const createCategory = async (data) => {
@@ -84,11 +85,17 @@ const createService = async (data) => {
     }
   };
   
-  const getServices = async (search) => {
+  const getServices = async (search, status, parent) => {
     try {
       const query = { isDeleted: false };
       if (search) {
         query.serviceName = { $regex: search, $options: 'i' }; // Case-insensitive search
+      }
+      if (status) {
+        query.status = { $regex: status, $options: 'i' }; // Case-insensitive search
+      }
+      if (parent) {
+        query.category = objectId(parent); 
       }
       return await ServiceModel.find(query).populate('category');
     } catch (error) {

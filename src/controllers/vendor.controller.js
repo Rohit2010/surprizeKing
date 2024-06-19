@@ -9,10 +9,19 @@ const createVendor = catchAsync(async (req, res) => {
     return res.json(newVendor)
 })
 
-const getAllVendors = catchAsync(async (req, res) => {
-    const {search} = req.query;
+const updateVendor = catchAsync(async (req, res) => {
+    const {vendorId} = req.params;
+    const data = req.body;
 
-    const vendors = await vendorService.getVendors(search);
+    const updateVen = await vendorService.updateVendor(vendorId, data);
+    
+    res.json(updateVen)
+})
+
+const getAllVendors = catchAsync(async (req, res) => {
+    const { vendorName, email, businessName, contactNumber } = req.query;
+
+    const vendors = await vendorService.getVendors({vendorName, email, businessName, contactNumber});
 
     res.json(vendors)
 })
@@ -27,5 +36,6 @@ const getVendorById = catchAsync(async (req, res) => {
 module.exports = {
     createVendor,
     getAllVendors,
-    getVendorById
+    getVendorById,
+    updateVendor
 }

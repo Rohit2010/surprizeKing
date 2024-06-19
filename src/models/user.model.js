@@ -10,11 +10,9 @@ const userSchema = new Schema({
   phone: {
     type: String,
     required: true,
-    unique: true, // Ensuring the phone number is unique
   },
   email: {
     type: String,
-    unique: true, // Ensuring the email is unique
   },
   role:{
     type:String,

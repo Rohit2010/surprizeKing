@@ -43,6 +43,10 @@ const vendorSchema = new Schema({
     metaKeyword: { type: String },
     metaDescription: { type: String },
     metaTags: { type: String },
+  },
+  isVerified:{
+    default:false,
+    type:Boolean
   }
 }, {
   timestamps: true // Automatically add createdAt and updatedAt fields

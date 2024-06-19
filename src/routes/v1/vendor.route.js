@@ -6,6 +6,7 @@ const {vendorController} = require("../../controllers/index")
 
 router.post("/create", vendorController.createVendor);
 router.get("/get/all", vendorController.getAllVendors);
+router.put("/update/:vendorId", vendorController.updateVendor)
 router.get("/get/:vendorId", vendorController.getVendorById);
 
 module.exports = router;

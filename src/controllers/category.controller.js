@@ -78,8 +78,8 @@ const updateServiceFun = catchAsync(async (req, res) => {
 
 // Get all services
 const getAllServices = catchAsync(async (req, res) => {
-    const { search } = req.query;
-    const services = await categoryService.getServices(search);
+    const { search, status, parent } = req.query;
+    const services = await categoryService.getServices(search, status, parent);
 
     res.json({ data: services });
 });
