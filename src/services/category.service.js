@@ -6,6 +6,12 @@ const { objectId } = require('../utils/queryPHandler');
 //category service functions
 const createCategory = async (data) => {
   try {
+    const check = await CategoryModel.findOne({
+      categoryName: new RegExp(`^${data.categoryName}$`, 'i')
+    });
+    if(check){
+      throw new ApiError(400, "Category already exists with same name")
+    }
     const newCategory = new CategoryModel(data);
     return await newCategory.save();
   } catch (error) {
@@ -78,6 +84,7 @@ const deleteCategory = async (id) => {
 // services/ sub category fucntions
 const createService = async (data) => {
     try {
+
       const newService = new ServiceModel(data);
       return await newService.save();
     } catch (error) {
