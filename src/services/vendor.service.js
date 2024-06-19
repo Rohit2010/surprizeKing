@@ -1,5 +1,5 @@
 const { userService } = require('.');
-const {  VendorModel } = require('../models');
+const {  VendorModel, VendorServiceModel } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { objectId } = require('../utils/queryPHandler');
 
@@ -99,10 +99,38 @@ const updateVendor = async (id, data) => {
 //   }
 // };
 
+const addOrEditServices = async (data) => {
+  try {
+    const checkVendorService = await VendorServiceModel.findOne({vendorId:objectId(data.vendorId)});
+    if(checkVendorService){
+        const updateService = await VendorServiceModel.findOneAndUpdate({vendorId:objectId(data.vendorId)}, data, {new:true});
+        return updateService;
+    }
+    else {
+      const newService = await VendorServiceModel.create(data);
+      await VendorModel.findByIdAndUpdate(objectId(data.vendorId), {isServicesAdded:true})
+      return newService;
+    }
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+}
+
+const getVendorServices = async (vendorId) => {
+    try {
+      const services = await VendorServiceModel.findOne({vendorId:objectId(vendorId)}).populate("services")
+      return services;
+    } catch (error) {
+      throw new ApiError(500, error.message);
+    }
+}
+
 module.exports = {
   createVendor,
   getVendors,
   getVendorById,
   updateVendor,
+  addOrEditServices,
+  getVendorServices
 //   deleteVendor
 };

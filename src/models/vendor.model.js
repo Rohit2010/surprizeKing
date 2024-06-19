@@ -47,6 +47,10 @@ const vendorSchema = new Schema({
   isVerified:{
     default:false,
     type:Boolean
+  },
+  isServicesAdded:{
+    default:false,
+    type:Boolean
   }
 }, {
   timestamps: true // Automatically add createdAt and updatedAt fields

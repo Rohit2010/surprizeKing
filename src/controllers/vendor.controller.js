@@ -33,9 +33,26 @@ const getVendorById = catchAsync(async (req, res) => {
     res.json(vendor)
 })
 
+// add vendor services
+const addVendorServices = catchAsync(async (req, res) => {
+    const {vendorId, userId, services} = req.body;
+
+    const newVendorServices = await vendorService.addOrEditServices({vendorId, userId, services});
+
+    res.json(newVendorServices)
+})
+const getvendorServices = catchAsync(async (req, res) => {
+    const {vendorId} = req.params;
+
+    const getVendorService = await vendorService.getVendorServices(vendorId);
+    res.json(getVendorService)
+})
+
 module.exports = {
     createVendor,
     getAllVendors,
     getVendorById,
-    updateVendor
+    updateVendor,
+    addVendorServices,
+    getvendorServices
 }
