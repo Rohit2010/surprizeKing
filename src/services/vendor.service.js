@@ -29,7 +29,7 @@ const getVendors = async ({vendorName,email, businessName, contactNumber }) => {
     if (contactNumber) {
       query['information.contactNumber'] = { $regex: contactNumber, $options: 'i' }; // Case-insensitive search
     }
-    return await VendorModel.find(query).populate("userId");
+    return await VendorModel.find(query, null, {sort:{createdAt:-1}}).populate("userId");
   } catch (error) {
     throw new ApiError(500, error.message);
   }
