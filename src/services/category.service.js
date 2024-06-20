@@ -28,7 +28,10 @@ const getCategories = async (search, status) => {
     if (status) {
       query.status = status; // Case-insensitive search
     }
-    return await CategoryModel.find(query);
+    const options = {
+      sort: { createdAt: -1 } // Sort by createdAt in descending order
+    };
+    return await CategoryModel.find(query, null, options);
   } catch (error) {
     throw new ApiError(500, error.message);
   }
@@ -104,7 +107,10 @@ const createService = async (data) => {
       if (parent) {
         query.category = objectId(parent); 
       }
-      return await ServiceModel.find(query).populate('category');
+      const options = {
+        sort: { createdAt: -1 } // Sort by createdAt in descending order
+      };
+      return await ServiceModel.find(query, null, options).populate('category');
     } catch (error) {
       throw new ApiError(500, error.message);
     }
